@@ -195,9 +195,9 @@ void cachehash_put(cachehash *ch, const void *key, size_t keylen, void *value)
     // create new node
 
     node_t *n;
-    void *newkey = malloc(keylen);
+    void *newkey = malloc(keylen+1);
     n = ch->curr_end;
-    memcpy(newkey, key, keylen);
+    memcpy(newkey, key, keylen+1);
 
     n->key = newkey;
     n->keylen = keylen;
