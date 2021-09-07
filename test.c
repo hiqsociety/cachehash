@@ -11,6 +11,11 @@
 #include <assert.h>
 #include <stdio.h>
 
+#include  <stdlib.h>
+#include <time.h>
+#include <unistd.h>
+
+
 cachehash *ch = NULL;
 
 void *randstring(int length) {
@@ -97,16 +102,16 @@ int main(void)
         ch = cachehash_init(5, NULL);
         
 
-        for(i=0; i<TAG_LEN; i++){
+        for(i=0; i<10; i++){
                 keya = randstring(1);
                 //void *keya = randstring(2);
                 valuea = randstring(1);
 		
-		cachehash_replace(ch, keya, strlen(keya), valuea);
+		cachehash_put(ch, keya, strlen(keya), valuea);
+                cachehash_debug_dump(ch);
 //              putK(ch, keya, valuea);
 /*
                 data = cachehash_get(ch, keya, sizeof(keya));
-                cachehash_debug_dump(ch);
 
 
                 printf("value of has is %s = %s\n", cachehash_has(ch, keya, sizeof(keya)), data);
