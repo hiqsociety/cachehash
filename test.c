@@ -18,6 +18,26 @@
 
 cachehash *ch = NULL;
 
+
+
+char *gen_rdm_bytestream(int num_bytes)
+{
+  char *stream = malloc(num_bytes);
+  int i;
+
+  int randlength = rand()%num_bytes+1;
+  for (i = 0; i < randlength; i++)
+  {
+    stream[i] = rand()%32+34;
+    //printf("i = %d,",i);
+  }
+
+  stream[randlength] = '\0';
+//  printf("dDDDDDDD = %s\n",stream);
+  return stream;
+}
+
+
 void *randstring(int length) {
     char *string = "abcdefghijklmnopqrstuvwxyz";
     size_t stringLen = 36;
@@ -168,12 +188,14 @@ int main(void)
 	int i;
 	char *data;
 
-	ch = cachehash_init(100000, NULL);
+	ch = cachehash_init(6, NULL);
 
 
-	for(i=0; i<10000000; i++){
+	for(i=0; i<800000; i++){
 		//keya = randstring(1);
-		keya = seqstring();
+		//keya = seqstring();
+		//keya = gen_rdm_bytestream(2);
+		keya = getline();
 
 		//void *keya = randstring(2);
 		//valuea = seqstr();
@@ -188,7 +210,7 @@ int main(void)
 
 
 
-		cachehash_put(ch, keya, strlen(keya), valuea, strlen(valuea));
+		cachehash_replace(ch, keya, strlen(keya), valuea, strlen(valuea));
 //		cachehash_debug_dump(ch);
 		//              putK(ch, keya, valuea);
 		/*
@@ -208,7 +230,9 @@ int main(void)
 		free(valuea);
 
 	}
-	//cachehash_debug_dump(ch);
+
+	printf("=================================\n");
+	cachehash_debug_dump(ch);
 	for(i=0;i<100000;i++){
 		keya = getline();
 		data = cachehash_get(ch, keya, strlen(keya));

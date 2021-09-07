@@ -1,0 +1,49 @@
+test.c: In function 'randstring':
+test.c:28:19: warning: trigraph ??! converted to | [-Wtrigraphs]
+   28 |      printf("WHAHT??!??!?!?!!?!?!\n\n\n");
+      |                    
+test.c:28:20: warning: trigraph ??! converted to | [-Wtrigraphs]
+test.c:39:22: warning: trigraph ??! converted to | [-Wtrigraphs]
+   39 |      printf("DAMNMMMM??!??!?!?!!?!?! = %d\n\n", strlen(randomString));
+      |                       
+test.c:39:23: warning: trigraph ??! converted to | [-Wtrigraphs]
+test.c:39:37: warning: format '%d' expects argument of type 'int', but argument 2 has type 'size_t' {aka 'long unsigned int'} [-Wformat=]
+   39 |      printf("DAMNMMMM??!??!?!?!!?!?! = %d\n\n", strlen(randomString));
+      |                                    ~^       ~~~~~~~~~~~~~~~~~~~~
+      |                                     |       |
+      |                                     int     size_t {aka long unsigned int}
+      |                                    !ld
+test.c: In function 'seqstring':
+test.c:50:2: warning: implicit declaration of function 'asprintf'; did you mean 'vsprintf'? [-Wimplicit-function-declaration]
+   50 |  asprintf(&str, "%i", seqnum--);
+      |  ^~~~~~~~
+      |  vsprintf
+test.c: In function 'testPutAndHas':
+test.c:92:27: warning: format '%s' expects argument of type 'char *', but argument 2 has type 'void *' [-Wformat=]
+   92 |  printf("value of has is %s\n", cachehash_has(ch, key, strlen(key)));
+      |                          ~^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                           |     |
+      |                           |     void *
+      |                           char *
+      |                          %p
+test.c: In function 'testEvict':
+test.c:109:27: warning: format '%s' expects argument of type 'char *', but argument 2 has type 'void *' [-Wformat=]
+  109 |  printf("value of has is %s\n", cachehash_has(ch, key, strlen(key)));
+      |                          ~^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                           |     |
+      |                           |     void *
+      |                           char *
+      |                          %p
+test.c: In function 'main':
+test.c:215:33: warning: format '%s' expects argument of type 'char *', but argument 3 has type 'void *' [-Wformat=]
+  215 |   printf("value of has is %s = %s = %s\n", keya, cachehash_has(ch, keya, sizeof(keya)), data);
+      |                                ~^                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                 |                |
+      |                                 char *           void *
+      |                                %p
+/usr/bin/ld: cachehash.o: in function `cachehash_replace':
+cachehash.c:(.text+0xb19): undefined reference to `unuse'
+/usr/bin/ld: cachehash.o: in function `cachehash_del':
+cachehash.c:(.text+0xbd7): undefined reference to `unuse'
+collect2: error: ld returned 1 exit status
+make: *** [Makefile:12: test_cachehash] Error 1

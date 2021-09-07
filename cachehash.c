@@ -135,6 +135,92 @@ static inline void use(cachehash *ch, node_t *n)
     ch->start = n;
     n->prev = NULL;
 }
+static inline void unuse(cachehash *ch, node_t *n)
+{
+    printf("HERERERERERE222\n");
+        //node_t *last = ch->end;
+        assert(ch);
+        assert(n);
+        //if first node, nothing to do and return
+        // remove from current spot in linked list
+        ch->currsize--;
+
+	printf("HERERERERERE333\n");
+        //reset clear n
+        //free(n->data);
+
+        int rc;
+        JHSD(rc, ch->judy, n->key, n->keylen);
+        if (rc) {
+                printf("        UNUSED!!!!EXIST!!! = %s\n",n->key);
+        }else{
+                printf("        UNUSED!!!!ERROR NOT EXIST!!!!!!!\n");
+                //cachehash_debug_dump(ch);
+        }
+        assert(rc);
+
+        if (n == ch->end) {
+                //                printf("ENDING!!!!!!!!!!!\n");
+                free(n->data);
+                n->data = NULL;
+                free(n->key);
+                n->key = NULL;
+                n->keylen = 0;
+                return;
+        }
+
+        if(ch->curr_end == n){
+                ch->curr_end = ch->curr_end->next;
+                ch->curr_end->prev = n->prev;
+        }
+
+        if (n == ch->start) {
+                //move start to 2nd in linked list
+                ch->start = n->next;
+
+                free(n->data);
+                n->data = NULL;
+                free(n->key);
+                n->key = NULL;
+                n->keylen = 0;
+
+                n->next = NULL;
+                n->prev = ch->end;
+
+
+                ch->end->next = n;
+                ch->end = n;
+                return;
+        }
+
+
+
+        free(n->data);
+        n->data = NULL;
+        free(n->key);
+        n->key = NULL;
+        n->keylen = 0;
+
+        if (ch->curr_end == ch->start) {
+                ch->curr_end == ch->end;
+
+        }
+
+        n->next->prev = n->prev;
+        n->prev->next = n->next;
+
+        n->next = NULL;
+        n->prev = ch->end;
+        ch->end->next = n;
+        ch->end = n;
+
+
+
+
+}
+
+
+
 
 static inline node_t* judy_get(cachehash *ch, void *key, size_t keylen)
 {
@@ -242,6 +328,120 @@ void cachehash_put(cachehash *ch, const void *key, size_t keylen, void *value, s
 //    free(newvalue);
 }
 
+
+
+//void cachehash_replace(cachehash *ch, void *key, int keylen, char *value, int valuelen)
+void cachehash_replace(cachehash *ch, const void *key, size_t keylen, void *value, size_t valuelen)
+{
+
+
+        Word_t *v_;
+        printf("\tREPLACE!!!! = %s -> %d\n", (void*) key, strlen(key));
+        //      pthread_mutex_lock(&lock);
+//        pthread_mutex_lock(&lock);
+        JHSG(v_, ch->judy, key, keylen);
+        if (!v_) {
+                cachehash_put(ch, key, keylen, value, valuelen);
+                //    pthread_mutex_unlock(&lock);
+                printf("        JUDY DEL!!!!NOT EXIST?!\n");
+        }else{ 
+                printf("        JUDY DEL!!!!EXIST!!!\n");
+//                int rc;
+                //    pthread_mutex_lock(&lock);
+                //                JHSD(rc, ch->judy, key, keylen);
+                //                assert(rc);
+                printf("        !!!!JJJJJ!!!\n");
+                node_t *n = ch->start;
+                do {
+                        if (strcmp(n->key,key) == 0) {
+                                printf("\tMATCHED!!! : %s -> %s\n", (void*) n->key, (void*) key);
+
+                                //                              free(n->key);
+                                //                              n->key = NULL;
+                                //                              n->keylen = 0;
+
+                                //                              free(n->data);
+                                //                              n->data = NULL;
+                                unuse(ch, n);
+                                //cachehash_debug_dump(ch);
+                                break;
+                                //                        }else{
+                                //                                printf("\tNOTTTTMATCHED!!! : %s -> %s\n", (void*) n->key, (void*) key);
+                }
+                n = n->next;
+                } while (n);
+                cachehash_put(ch, key, keylen, value, valuelen);
+        }
+
+        cachehash_debug_dump(ch);
+
+/*
+
+//        printf("key = %s ",key);
+//        pthread_mutex_lock(&lock);
+        Word_t *v_;
+        JHSG(v_, ch->judy, key, keylen);
+        if (!v_) {
+//                pthread_mutex_unlock(&lock);
+                //              printf("\tINSERT1 = %s : %x -> %d, %d -> %x -> %d\n", key, (void*) key, strlen(key), sizeof(key), (void*) value, sizeof(*value));
+                cachehash_put(ch, key, keylen, value);
+        }else{  
+//                pthread_mutex_unlock(&lock);
+                //              printf("\tINSERT2 = %x -> %d -> %d -> %x\n", (void*) key, sizeof(key), (void*) value, ((node_t*) *v_)->key);
+                //node_t *nx = judy_get(ch, key, strlen(key));
+                //usez(ch, n, key, value);
+                //cachehash_get(ch, key);
+                cachehash_del(ch, key, keylen);
+                //cachehash_put(ch, key, keylen, value);
+                //cachehash_put(ch, key, sizeof(*key), value, sizeof(*value));
+        }
+        cachehash_debug_dump(ch);
+*/
+}
+
+void cachehash_del(cachehash *ch, const void *key, size_t keylen)
+{
+        Word_t *v_;
+        //      printf("\tDELETE!!!! = %s -> %d\n", (void*) key, strlen(key));
+        //      pthread_mutex_lock(&lock);
+//        pthread_mutex_lock(&lock);
+        JHSG(v_, ch->judy, key, keylen);
+        if (!v_) {
+                //    pthread_mutex_unlock(&lock);
+                //                printf("        DEL!!!!NOT EXIST?!\n");
+        }else{  
+                //                printf("        DEL!!!!EXIST!!!\n");
+//                int rc;
+                //    pthread_mutex_lock(&lock);
+                //                JHSD(rc, ch->judy, key, keylen);
+                //                assert(rc);
+                //                printf("        !!!!JJJJJ!!!\n");
+                node_t *n = ch->start;
+                do {
+                        if (strcmp(n->key,key) == 0) {
+                                //                                printf("\tMATCHED!!! : %s -> %s\n", (void*) n->key, (void*) key);
+
+                                //                              free(n->key);
+                                //                              n->key = NULL;
+                                //                              n->keylen = 0;
+
+                                //                              free(n->data);
+                                //                              n->data = NULL;
+                                unuse(ch, n);
+                                //cachehash_debug_dump(ch);
+                                break;
+                                //                        }else{
+                                //                                printf("\tNOTTTTMATCHED!!! : %s -> %s\n", (void*) n->key, (void*) key);
+                }
+                n = n->next;
+                } while (n);
+        }
+        //      pthread_mutex_unlock(&lock);
+//        pthread_mutex_unlock(&lock);
+}
+
+
+
 // print out entire state.
 void cachehash_debug_dump(cachehash *ch)
 {
@@ -254,44 +454,57 @@ void cachehash_debug_dump(cachehash *ch)
     node_t *n = ch->start;
 
     do {
-        if (n->key) {
-            printf("\t%lu: %s -> %s\n", i++, (char*) n->key, (char*) n->data);
-        } else {
-            printf("\t%lu: EMPTY\n", i++);
-        }
-        n = n->next;
+	    if (n->key == ch->curr_end->key) {
+		    printf("THIS IS CURR END KEY ");
+	    }else{  
+		    printf("\t\t");
+	    }
+
+	    if (n->key == ch->end->key) {
+		    printf("THIS IS ENDING KEY ");
+		    //}else{
+		    //   printf("\t\t");
+    }
+
+    if (n->key) {
+	    printf("\t\t%lu: %s -> %s\n", i++, (char*) n->key, (char*) n->data);
+    } else {
+	    printf("\t\t%lu: EMPTY\n", i++);
+    }
+
+    n = n->next;
     } while (n);
 }
 
 void cachehash_free(cachehash *ch, cachehash_process_cb *cb)
 {
-    assert(ch);
-    int rc;
-    JHSFA(rc, ch->judy);
-    node_t *n = ch->start;
-    do {
-        if (n->key) {
-            free(n->key);
-            if (cb) {
-                cb(n->data);
-            }
-        }
-        n = n->next;
-    } while(n);
-    free(ch->malloced);
-    free(ch);
+	assert(ch);
+	int rc;
+	JHSFA(rc, ch->judy);
+	node_t *n = ch->start;
+	do {
+		if (n->key) {
+			free(n->key);
+			if (cb) {
+				cb(n->data);
+			}
+		}
+		n = n->next;
+	} while(n);
+	free(ch->malloced);
+	free(ch);
 } 
 
 void cachehash_iter(cachehash *ch, cachehash_process_cb *cb)
 {
-    node_t *n = ch->start;
-    do {
-        if (n->key) {
-            cb(n->data);
-        } else {
-        	break;
-        }
-        n = n->next;
-    } while (n);
+	node_t *n = ch->start;
+	do {
+		if (n->key) {
+			cb(n->data);
+		} else {
+			break;
+		}
+		n = n->next;
+	} while (n);
 }
 

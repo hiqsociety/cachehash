@@ -41,7 +41,7 @@ void cachehash_set_evict_cb(cachehash *ch, cachehash_process_cb *cb);
   
   
 void cachehash_del(cachehash *ch, const void *key, size_t keylen);
-void cachehash_replace(cachehash *ch, const void *key, size_t keylen, void *value);
+void cachehash_replace(cachehash *ch, const void *key, size_t keylen, void *value, size_t valuelen);
 
 
 #ifdef __cplusplus
