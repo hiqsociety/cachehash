@@ -38,6 +38,11 @@ void cachehash_iter(cachehash *ch, cachehash_process_cb *cb);
 void cachehash_debug_dump(cachehash *ch);
 // change the callback function for the cachehash
 void cachehash_set_evict_cb(cachehash *ch, cachehash_process_cb *cb);
+  
+  
+void cachehash_del(cachehash *ch, const void *key, size_t keylen);
+void cachehash_replace(cachehash *ch, const void *key, size_t keylen, void *value);
+
 
 #ifdef __cplusplus
 }
