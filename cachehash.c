@@ -6,6 +6,7 @@
  * of the License at http://www.apache.org/licenses/LICENSE-2.0
  */
 
+//#include "triemap.h"
 #include "cachehash.h"
 
 #include <stddef.h>
@@ -28,6 +29,9 @@ typedef struct node {
     size_t keylen;
     void *data;
 } node_t;
+
+
+//TrieMap *tm = NewTrieMap();
 
 // data structure that contains the enterity of a linked list
 // we typedef this as cachehash in cachehash.h s.t. external interface is clean
@@ -96,10 +100,12 @@ static inline void* evict(cachehash *ch)
     assert(rc);
     // reset linked list node
     void *retv = last->data;
-    last->data = NULL;
     free(last->key);
     last->key = NULL;
     last->keylen = 0;
+
+    free(last->data);
+    last->data = NULL;
     ch->currsize--;
     ch->curr_end = ch->end;
     return retv;
@@ -181,7 +187,7 @@ void* cachehash_evict_if_full(cachehash *ch)
     return evict(ch);
 }
 
-void cachehash_put(cachehash *ch, const void *key, size_t keylen, void *value)
+void cachehash_put(cachehash *ch, const void *key, size_t keylen, void *value, size_t valuelen)
 {
     assert(ch);
     assert(key);
@@ -199,9 +205,21 @@ void cachehash_put(cachehash *ch, const void *key, size_t keylen, void *value)
     n = ch->curr_end;
     memcpy(newkey, key, keylen+1);
 
+    void *newvalue = malloc(valuelen+1);
+    memcpy(newvalue, value, valuelen+1);
+
+    if (n->key) {
+	    free(n->key);
+	    n->key = NULL;
+    }
+
     n->key = newkey;
     n->keylen = keylen;
-    n->data = value;
+    if (n->data) {
+	    free(n->data);
+	    n->data = NULL;
+    }
+    n->data = newvalue;
     //n->prev = ch->curr_end->prev;
     //n->next = ch->curr_end->next;
 
@@ -219,6 +237,9 @@ void cachehash_put(cachehash *ch, const void *key, size_t keylen, void *value)
     // key should not already be in hash table
     assert(!*v_);
     *v_ = (Word_t) n;
+
+//    free(newkey);
+//    free(newvalue);
 }
 
 // print out entire state.

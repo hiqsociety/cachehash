@@ -26,7 +26,7 @@ void* cachehash_has(cachehash *ch, const void *key, size_t keylen);
 // return item from cachehash and move to front
 void* cachehash_get(cachehash *ch, const void *key, size_t keylen);
 // add item to the cachehash
-void cachehash_put(cachehash *ch, const void *key, size_t keylen, void *value);
+void cachehash_put(cachehash *ch, const void *key, size_t keylen, void *value, size_t valuelen);
 // free memory used by a cachehash. unusable until new initialization
 void cachehash_free(cachehash *ch, cachehash_process_cb *cb);
 // evict the LRU if the cachehash is full

@@ -42,12 +42,15 @@ void *randstring(int length) {
 }
 
 
-int seqnum = 0;
+int seqnum = 100000;
 int seqnum1 = 0;
 
 char* seqstring() {
 	char* str;
-	asprintf(&str, "%i", seqnum++);
+	asprintf(&str, "%i", seqnum--);
+	if (seqnum == 0) {
+		seqnum = 100000;
+	}
 	//free(str);
 	return str;
 }
@@ -71,11 +74,11 @@ void testPut(void)
 	ch = cachehash_init(5, NULL);
 	char *key = "test-key";
 	char *value = "test-value";
-	cachehash_put(ch, key, strlen(key), value);
+	cachehash_put(ch, key, strlen(key), value, strlen(value));
 	cachehash_debug_dump(ch);
 	key = "test-key-2";
 	value = "test-value-2";
-	cachehash_put(ch, key, strlen(key), value);
+	cachehash_put(ch, key, strlen(key), value, strlen(value));
 	cachehash_debug_dump(ch);
 }
 
@@ -84,7 +87,7 @@ void testPutAndHas(void)
 	ch = cachehash_init(5, NULL);
 	char *key = "test-key";
 	char *value = "test-value";
-	cachehash_put(ch, key, strlen(key), value);
+	cachehash_put(ch, key, strlen(key), value, strlen(value));
 	cachehash_debug_dump(ch);
 	printf("value of has is %s\n", cachehash_has(ch, key, strlen(key)));
 	assert(cachehash_has(ch, key, strlen(key)) == value);
@@ -101,7 +104,7 @@ void testEvict(void)
 	ch = cachehash_init(5, NULL);
 	char *key = "test-key";
 	char *value = "test-value";
-	cachehash_put(ch, key, strlen(key), value);
+	cachehash_put(ch, key, strlen(key), value, strlen(value));
 	cachehash_debug_dump(ch);
 	printf("value of has is %s\n", cachehash_has(ch, key, strlen(key)));
 	assert(cachehash_has(ch, key, strlen(key)) == value);
@@ -165,24 +168,27 @@ int main(void)
 	int i;
 	char *data;
 
-	ch = cachehash_init(10000000, NULL);
+	ch = cachehash_init(100000, NULL);
 
 
-	for(i=0; i<1; i++){
+	for(i=0; i<10000000; i++){
 		//keya = randstring(1);
 		keya = seqstring();
 
 		//void *keya = randstring(2);
 		//valuea = seqstr();
-		valuea = seqstring();
+		valuea = seqstr();
 //		valuea = seqstring();
 
 //		printf("value of has is %d. %s = cachehash = %s = %d\n", i, keya, cachehash_has(ch, keya, strlen(keya)), strlen(keya));
 
-		printf("test = %s = %s\n",keya,valuea);
+//		printf("test = %s = %s\n",keya,valuea);
 
 //		printf("test\n\n",keya,valuea);
-		cachehash_put(ch, keya, strlen(keya), valuea);
+
+
+
+		cachehash_put(ch, keya, strlen(keya), valuea, strlen(valuea));
 //		cachehash_debug_dump(ch);
 		//              putK(ch, keya, valuea);
 		/*
@@ -198,10 +204,11 @@ int main(void)
 
 		   cachehash_debug_dump(ch);
 		   */
-	//	free(keya);
-	//	free(valuea);
+		free(keya);
+		free(valuea);
 
 	}
+	//cachehash_debug_dump(ch);
 	for(i=0;i<100000;i++){
 		keya = getline();
 		data = cachehash_get(ch, keya, strlen(keya));
